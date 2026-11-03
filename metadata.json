@@ -1,0 +1,6 @@
+{
+  "name": "Image to PPT",
+  "description": "Convert your image collections into beautiful, professional PowerPoint presentations with custom layouts, themes, and instant download.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

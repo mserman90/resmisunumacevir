@@ -1,0 +1,2187 @@
+===== package.json =====
+{
+  "name": "image-to-ppt",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@prisma/client": "^5.20.0",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.441.0",
+    "next": "14.2.13",
+    "next-auth": "^4.24.7",
+    "pptxgenjs": "^3.12.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.0",
+    "tailwind-merge": "^2.5.2",
+    "uuid": "^10.0.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.16.5",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@types/uuid": "^10.0.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.13",
+    "postcss": "^8.4.47",
+    "prisma": "^5.20.0",
+    "tailwindcss": "^3.4.12",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.2"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
+}
+
+===== tsconfig.json =====
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+
+===== next.config.js =====
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
+  },
+  images: {
+    remotePatterns: [],
+  },
+}
+
+module.exports = nextConfig
+
+===== tailwind.config.ts =====
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+    },
+  },
+  plugins: [],
+};
+export default config;
+
+===== postcss.config.js =====
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+===== .env =====
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_SECRET="image-to-ppt-super-secret-key-change-in-production-2024"
+NEXTAUTH_URL="http://localhost:3000"
+
+===== .env.example =====
+DATABASE_URL="file:./dev.db"
+NEXTAUTH_SECRET="change-me-to-a-long-random-string"
+NEXTAUTH_URL="http://localhost:3000"
+
+===== .gitignore =====
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+/coverage
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env*.local
+.env
+.vercel
+*.tsbuildinfo
+next-env.d.ts
+prisma/dev.db
+prisma/dev.db-journal
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+===== next-env.d.ts =====
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+===== prisma/schema.prisma =====
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  password  String
+  createdAt DateTime  @default(now())
+  projects  Project[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images      Image[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  order     Int      @default(0)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+===== prisma/seed.ts =====
+import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
+
+const prisma = new PrismaClient()
+
+async function main() {
+  const password = await bcrypt.hash('demo1234', 10)
+
+  const user = await prisma.user.upsert({
+    where: { email: 'demo@example.com' },
+    update: {},
+    create: {
+      email: 'demo@example.com',
+      name: 'Alex Rivera',
+      password,
+    },
+  })
+
+  await prisma.project.deleteMany({ where: { userId: user.id } })
+
+  const projects = [
+    {
+      title: 'Product Launch Deck',
+      description: 'Key visuals for the Q4 product launch presentation',
+      images: [
+        { filename: 'hero-product.jpg', url: '/demo/placeholder-1.svg', order: 0 },
+        { filename: 'feature-1.jpg', url: '/demo/placeholder-2.svg', order: 1 },
+        { filename: 'team.jpg', url: '/demo/placeholder-3.svg', order: 2 },
+      ],
+    },
+    {
+      title: 'Travel Portfolio',
+      description: 'Selected photos from the 2025 Asia trip',
+      images: [
+        { filename: 'tokyo.jpg', url: '/demo/placeholder-4.svg', order: 0 },
+        { filename: 'bali.jpg', url: '/demo/placeholder-5.svg', order: 1 },
+      ],
+    },
+    {
+      title: 'Empty Project',
+      description: 'Ready for your images — upload and convert to PowerPoint',
+      images: [],
+    },
+  ]
+
+  for (const p of projects) {
+    await prisma.project.create({
+      data: {
+        title: p.title,
+        description: p.description,
+        userId: user.id,
+        images: {
+          create: p.images,
+        },
+      },
+    })
+  }
+
+  console.log('Seeded demo user: demo@example.com / demo1234')
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect()
+  })
+  .catch(async (e) => {
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })
+
+===== src/lib/prisma.ts =====
+import { PrismaClient } from '@prisma/client'
+
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+export const prisma = globalForPrisma.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+
+===== src/lib/auth.ts =====
+import { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { prisma } from './prisma'
+import bcrypt from 'bcryptjs'
+
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) return null
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        })
+        if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+          return null
+        }
+        return { id: user.id, email: user.email, name: user.name }
+      },
+    }),
+  ],
+  session: { strategy: 'jwt' },
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        ;(session.user as any).id = token.id as string
+      }
+      return session
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+}
+
+===== src/lib/utils.ts =====
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+export function formatDate(date: string | Date) {
+  return new Date(date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
+===== src/types/next-auth.d.ts =====
+import 'next-auth'
+
+declare module 'next-auth' {
+  interface Session {
+    user: {
+      id: string
+      email?: string | null
+      name?: string | null
+      image?: string | null
+    }
+  }
+
+  interface User {
+    id: string
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string
+  }
+}
+
+===== src/middleware.ts =====
+export { default } from 'next-auth/middleware'
+
+export const config = {
+  matcher: ['/', '/projects/:path*'],
+}
+
+===== src/app/globals.css =====
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 239 84% 67%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+===== src/app/layout.tsx =====
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { Providers } from '@/components/providers'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'Image to PPT',
+  description: 'Convert your images into beautiful PowerPoint presentations',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+
+===== src/components/providers.tsx =====
+'use client'
+
+import { SessionProvider } from 'next-auth/react'
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return <SessionProvider>{children}</SessionProvider>
+}
+
+===== src/app/api/auth/[...nextauth]/route.ts =====
+import NextAuth from 'next-auth'
+import { authOptions } from '@/lib/auth'
+
+const handler = NextAuth(authOptions)
+export { handler as GET, handler as POST }
+
+===== src/app/api/register/route.ts =====
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
+import { z } from 'zod'
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  name: z.string().min(1),
+})
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json()
+    const { email, password, name } = schema.parse(body)
+
+    const exists = await prisma.user.findUnique({ where: { email } })
+    if (exists) {
+      return NextResponse.json({ error: 'User already exists' }, { status: 400 })
+    }
+
+    const hashed = await bcrypt.hash(password, 10)
+    const user = await prisma.user.create({
+      data: { email, password: hashed, name },
+    })
+
+    return NextResponse.json({ id: user.id, email: user.email, name: user.name })
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
+  }
+}
+
+===== src/app/api/projects/route.ts =====
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { z } from 'zod'
+
+const createSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().max(1000).optional(),
+})
+
+export async function GET() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const projects = await prisma.project.findMany({
+    where: { userId: session.user.id },
+    include: {
+      images: { orderBy: { order: 'asc' }, take: 4 },
+      _count: { select: { images: true } },
+    },
+    orderBy: { updatedAt: 'desc' },
+  })
+
+  return NextResponse.json(projects)
+}
+
+export async function POST(req: Request) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await req.json()
+    const data = createSchema.parse(body)
+
+    const project = await prisma.project.create({
+      data: {
+        title: data.title,
+        description: data.description || null,
+        userId: session.user.id,
+      },
+      include: {
+        images: true,
+        _count: { select: { images: true } },
+      },
+    })
+
+    return NextResponse.json(project, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
+  }
+}
+
+===== src/app/api/projects/[id]/route.ts =====
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { z } from 'zod'
+
+const updateSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  description: z.string().max(1000).optional().nullable(),
+})
+
+async function getOwnedProject(id: string, userId: string) {
+  return prisma.project.findFirst({
+    where: { id, userId },
+    include: {
+      images: { orderBy: { order: 'asc' } },
+      _count: { select: { images: true } },
+    },
+  })
+}
+
+export async function GET(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const project = await getOwnedProject(params.id, session.user.id)
+  if (!project) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  return NextResponse.json(project)
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const existing = await getOwnedProject(params.id, session.user.id)
+  if (!existing) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  try {
+    const body = await req.json()
+    const data = updateSchema.parse(body)
+
+    const project = await prisma.project.update({
+      where: { id: params.id },
+      data: {
+        title: data.title ?? undefined,
+        description: data.description === undefined ? undefined : data.description,
+      },
+      include: {
+        images: { orderBy: { order: 'asc' } },
+        _count: { select: { images: true } },
+      },
+    })
+
+    return NextResponse.json(project)
+  } catch {
+    return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
+  }
+}
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const existing = await getOwnedProject(params.id, session.user.id)
+  if (!existing) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  await prisma.project.delete({ where: { id: params.id } })
+  return NextResponse.json({ success: true })
+}
+
+===== src/app/api/projects/[id]/images/route.ts =====
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { writeFile, mkdir } from 'fs/promises'
+import path from 'path'
+import { v4 as uuidv4 } from 'uuid'
+
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const project = await prisma.project.findFirst({
+    where: { id: params.id, userId: session.user.id },
+    include: { images: true },
+  })
+  if (!project) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  try {
+    const formData = await req.formData()
+    const files = formData.getAll('files') as File[]
+
+    if (!files.length) {
+      return NextResponse.json({ error: 'No files provided' }, { status: 400 })
+    }
+
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    await mkdir(uploadDir, { recursive: true })
+
+    const maxOrder = project.images.reduce((max, img) => Math.max(max, img.order), -1)
+    const created = []
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+      if (!file.type.startsWith('image/')) continue
+
+      const ext = file.name.split('.').pop() || 'jpg'
+      const filename = `${uuidv4()}.${ext}`
+      const buffer = Buffer.from(await file.arrayBuffer())
+      const filePath = path.join(uploadDir, filename)
+      await writeFile(filePath, buffer)
+
+      const image = await prisma.image.create({
+        data: {
+          filename: file.name,
+          url: `/uploads/${filename}`,
+          order: maxOrder + 1 + i,
+          projectId: params.id,
+        },
+      })
+      created.push(image)
+    }
+
+    await prisma.project.update({
+      where: { id: params.id },
+      data: { updatedAt: new Date() },
+    })
+
+    return NextResponse.json(created, { status: 201 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+  }
+}
+
+===== src/app/api/images/[id]/route.ts =====
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { z } from 'zod'
+import { unlink } from 'fs/promises'
+import path from 'path'
+
+const updateSchema = z.object({
+  order: z.number().int().min(0).optional(),
+})
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const image = await prisma.image.findUnique({
+    where: { id: params.id },
+    include: { project: true },
+  })
+  if (!image || image.project.userId !== session.user.id) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  try {
+    const body = await req.json()
+    const data = updateSchema.parse(body)
+
+    const updated = await prisma.image.update({
+      where: { id: params.id },
+      data: { order: data.order },
+    })
+
+    await prisma.project.update({
+      where: { id: image.projectId },
+      data: { updatedAt: new Date() },
+    })
+
+    return NextResponse.json(updated)
+  } catch {
+    return NextResponse.json({ error: 'Invalid data' }, { status: 400 })
+  }
+}
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const image = await prisma.image.findUnique({
+    where: { id: params.id },
+    include: { project: true },
+  })
+  if (!image || image.project.userId !== session.user.id) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  try {
+    if (image.url.startsWith('/uploads/')) {
+      const filePath = path.join(process.cwd(), 'public', image.url)
+      await unlink(filePath).catch(() => {})
+    }
+  } catch {}
+
+  await prisma.image.delete({ where: { id: params.id } })
+
+  await prisma.project.update({
+    where: { id: image.projectId },
+    data: { updatedAt: new Date() },
+  })
+
+  return NextResponse.json({ success: true })
+}
+
+===== src/app/api/projects/[id]/generate/route.ts =====
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import PptxGenJS from 'pptxgenjs'
+import path from 'path'
+import fs from 'fs'
+
+export async function POST(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const project = await prisma.project.findFirst({
+    where: { id: params.id, userId: session.user.id },
+    include: { images: { orderBy: { order: 'asc' } } },
+  })
+
+  if (!project) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  if (project.images.length === 0) {
+    return NextResponse.json({ error: 'No images to convert' }, { status: 400 })
+  }
+
+  try {
+    const pptx = new PptxGenJS()
+    pptx.defineLayout({ name: 'LAYOUT_16x9', width: 13.333, height: 7.5 })
+    pptx.layout = 'LAYOUT_16x9'
+    pptx.author = 'Image-to-PPT'
+    pptx.title = project.title
+    pptx.subject = project.description || 'Generated from images'
+
+    for (const img of project.images) {
+      const slide = pptx.addSlide()
+      const imgPath = path.join(process.cwd(), 'public', img.url.replace(/^\//, ''))
+
+      if (!fs.existsSync(imgPath)) {
+        slide.addShape(pptx.ShapeType.rect, {
+          x: 0, y: 0, w: '100%', h: '100%',
+          fill: { color: '6366F1' },
+        })
+        slide.addText(img.filename || 'Image', {
+          x: 0.5, y: 3.2, w: 12.333, h: 1,
+          fontSize: 24, color: 'FFFFFF', align: 'center',
+        })
+        continue
+      }
+
+      slide.addShape(pptx.ShapeType.rect, {
+        x: 0, y: 0, w: '100%', h: 0.7,
+        fill: { color: '1E293B' },
+      })
+      slide.addText(project.title, {
+        x: 0.4, y: 0.15, w: 12.5, h: 0.4,
+        fontSize: 16, color: 'FFFFFF', bold: true,
+      })
+
+      slide.addImage({
+        path: imgPath,
+        x: 0.5,
+        y: 1.0,
+        w: 12.333,
+        h: 6.0,
+        sizing: { type: 'contain', w: 12.333, h: 6.0 },
+      })
+    }
+
+    const buffer = (await pptx.write({ outputType: 'nodebuffer' })) as Buffer
+
+    const safeName = project.title.replace(/[^a-z0-9]/gi, '-').toLowerCase() || 'presentation'
+
+    return new NextResponse(buffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'Content-Disposition': `attachment; filename="${safeName}.pptx"`,
+        'Content-Length': buffer.length.toString(),
+      },
+    })
+  } catch (error) {
+    console.error('PPT generation error:', error)
+    return NextResponse.json({ error: 'Failed to generate presentation' }, { status: 500 })
+  }
+}
+
+===== src/components/ui/button.tsx =====
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
+
+const buttonVariants = cva(
+  'inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  {
+    variants: {
+      variant: {
+        default: 'bg-indigo-600 text-white hover:bg-indigo-700',
+        destructive: 'bg-red-600 text-white hover:bg-red-700',
+        outline: 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-900',
+        secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200',
+        ghost: 'hover:bg-slate-100 text-slate-700',
+        link: 'text-indigo-600 underline-offset-4 hover:underline',
+      },
+      size: {
+        default: 'h-10 px-4 py-2',
+        sm: 'h-8 rounded-md px-3 text-xs',
+        lg: 'h-11 rounded-lg px-8',
+        icon: 'h-10 w-10',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = 'Button'
+
+export { Button, buttonVariants }
+
+===== src/components/ui/input.tsx =====
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          'flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = 'Input'
+
+export { Input }
+
+===== src/components/ui/textarea.tsx =====
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <textarea
+        className={cn(
+          'flex min-h-[80px] w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Textarea.displayName = 'Textarea'
+
+export { Textarea }
+
+===== src/components/ui/card.tsx =====
+import * as React from 'react'
+import { cn } from '@/lib/utils'
+
+const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn('rounded-xl border border-slate-200 bg-white text-slate-950 shadow-sm', className)}
+      {...props}
+    />
+  )
+)
+Card.displayName = 'Card'
+
+const CardHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn('flex flex-col space-y-1.5 p-6', className)} {...props} />
+  )
+)
+CardHeader.displayName = 'CardHeader'
+
+const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3 ref={ref} className={cn('text-lg font-semibold leading-none tracking-tight', className)} {...props} />
+  )
+)
+CardTitle.displayName = 'CardTitle'
+
+const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p ref={ref} className={cn('text-sm text-slate-500', className)} {...props} />
+  )
+)
+CardDescription.displayName = 'CardDescription'
+
+const CardContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn('p-6 pt-0', className)} {...props} />
+  )
+)
+CardContent.displayName = 'CardContent'
+
+export { Card, CardHeader, CardTitle, CardDescription, CardContent }
+
+===== src/components/ui/toast.tsx =====
+'use client'
+
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { X, CheckCircle, AlertCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+type ToastType = 'success' | 'error'
+
+interface Toast {
+  id: number
+  message: string
+  type: ToastType
+}
+
+interface ToastContextType {
+  toast: (message: string, type?: ToastType) => void
+}
+
+const ToastContext = createContext<ToastContextType | null>(null)
+
+export function useToast() {
+  const ctx = useContext(ToastContext)
+  if (!ctx) throw new Error('useToast must be used within ToastProvider')
+  return ctx
+}
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toasts, setToasts] = useState<Toast[]>([])
+
+  const toast = useCallback((message: string, type: ToastType = 'success') => {
+    const id = Date.now()
+    setToasts((prev) => [...prev, { id, message, type }])
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id))
+    }, 3500)
+  }, [])
+
+  const dismiss = (id: number) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id))
+  }
+
+  return (
+    <ToastContext.Provider value={{ toast }}>
+      {children}
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+        {toasts.map((t) => (
+          <div
+            key={t.id}
+            className={cn(
+              'flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg text-sm font-medium min-w-[280px]',
+              t.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'
+            )}
+          >
+            {t.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+            <span className="flex-1">{t.message}</span>
+            <button onClick={() => dismiss(t.id)} className="opacity-70 hover:opacity-100">
+              <X size={16} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </ToastContext.Provider>
+  )
+}
+
+===== src/components/sidebar.tsx =====
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
+import {
+  LayoutDashboard,
+  FolderPlus,
+  LogOut,
+  Menu,
+  X,
+  Presentation,
+} from 'lucide-react'
+import { useState } from 'react'
+import { cn } from '@/lib/utils'
+import { Button } from './ui/button'
+
+interface SidebarProps {
+  user: {
+    name?: string | null
+    email?: string | null
+  }
+}
+
+const navItems = [
+  { href: '/', label: 'Projects', icon: LayoutDashboard },
+  { href: '/projects/new', label: 'New Project', icon: FolderPlus },
+]
+
+export function Sidebar({ user }: SidebarProps) {
+  const pathname = usePathname()
+  const [open, setOpen] = useState(false)
+
+  return (
+    <>
+      <button
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white border shadow-sm md:hidden"
+        onClick={() => setOpen(!open)}
+      >
+        {open ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-white flex flex-col transition-transform duration-200 md:translate-x-0 md:static',
+          open ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="p-6 border-b border-slate-800">
+          <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
+            <div className="w-9 h-9 rounded-lg bg-indigo-500 flex items-center justify-center">
+              <Presentation size={20} />
+            </div>
+            <div>
+              <h1 className="font-semibold text-lg leading-tight">Image to PPT</h1>
+              <p className="text-xs text-slate-400">Convert images → slides</p>
+            </div>
+          </Link>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-1">
+          {navItems.map((item) => {
+            const active = pathname === item.href
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors',
+                  active
+                    ? 'bg-indigo-600 text-white'
+                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                )}
+              >
+                <item.icon size={18} />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+
+        <div className="p-4 border-t border-slate-800">
+          <div className="flex items-center gap-3 px-2 mb-3">
+            <div className="w-9 h-9 rounded-full bg-indigo-500/30 flex items-center justify-center text-sm font-medium">
+              {(user.name || user.email || 'U')[0].toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium truncate">{user.name || 'User'}</p>
+              <p className="text-xs text-slate-400 truncate">{user.email}</p>
+            </div>
+          </div>
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-slate-300 hover:text-white hover:bg-slate-800"
+            onClick={() => signOut({ callbackUrl: '/login' })}
+          >
+            <LogOut size={16} className="mr-2" />
+            Sign out
+          </Button>
+        </div>
+      </aside>
+    </>
+  )
+}
+
+===== src/app/(dashboard)/layout.tsx =====
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+import { Sidebar } from '@/components/sidebar'
+import { ToastProvider } from '@/components/ui/toast'
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const session = await getServerSession(authOptions)
+  if (!session) redirect('/login')
+
+  return (
+    <ToastProvider>
+      <div className="flex h-screen bg-slate-50">
+        <Sidebar user={session.user} />
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-6 md:p-8 max-w-7xl mx-auto">{children}</div>
+        </main>
+      </div>
+    </ToastProvider>
+  )
+}
+
+===== src/app/(dashboard)/page.tsx =====
+'use client'
+
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import {
+  Plus,
+  Images,
+  Trash2,
+  Download,
+  FolderOpen,
+  Loader2,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useToast } from '@/components/ui/toast'
+import { formatDate } from '@/lib/utils'
+
+interface Project {
+  id: string
+  title: string
+  description: string | null
+  createdAt: string
+  updatedAt: string
+  images: { id: string; url: string; filename: string }[]
+  _count: { images: number }
+}
+
+export default function DashboardPage() {
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [generatingId, setGeneratingId] = useState<string | null>(null)
+  const { toast } = useToast()
+  const router = useRouter()
+
+  useEffect(() => {
+    fetchProjects()
+  }, [])
+
+  async function fetchProjects() {
+    try {
+      const res = await fetch('/api/projects')
+      if (res.ok) {
+        const data = await res.json()
+        setProjects(data)
+      }
+    } catch {
+      toast('Failed to load projects', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this project and all its images?')) return
+    setDeletingId(id)
+    setProjects((prev) => prev.filter((p) => p.id !== id))
+    try {
+      const res = await fetch(`/api/projects/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error()
+      toast('Project deleted')
+    } catch {
+      toast('Failed to delete', 'error')
+      fetchProjects()
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  async function handleGenerate(id: string, title: string) {
+    setGeneratingId(id)
+    try {
+      const res = await fetch(`/api/projects/${id}/generate`, { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Generation failed')
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${title.replace(/\s+/g, '-')}.pptx`
+      a.click()
+      URL.revokeObjectURL(url)
+      toast('Presentation downloaded!')
+    } catch (e: any) {
+      toast(e.message || 'Failed to generate PPT', 'error')
+    } finally {
+      setGeneratingId(null)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
+            <div className="h-4 w-64 bg-slate-100 rounded mt-2 animate-pulse" />
+          </div>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-64 rounded-xl bg-slate-100 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900">Your Projects</h1>
+          <p className="text-slate-500 mt-1">
+            Convert image collections into PowerPoint presentations
+          </p>
+        </div>
+        <Link href="/projects/new">
+          <Button>
+            <Plus size={18} className="mr-2" />
+            New Project
+          </Button>
+        </Link>
+      </div>
+
+      {projects.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
+              <Images className="text-indigo-500" size={28} />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900">No projects yet</h3>
+            <p className="text-slate-500 mt-1 max-w-sm">
+              Create your first project, upload images, and generate a PowerPoint in seconds.
+            </p>
+            <Link href="/projects/new" className="mt-6">
+              <Button>
+                <Plus size={18} className="mr-2" />
+                Create Project
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project) => (
+            <Card key={project.id} className="overflow-hidden group hover:shadow-md transition-shadow">
+              <div className="h-36 bg-slate-100 relative overflow-hidden">
+                {project.images.length > 0 ? (
+                  <div className="grid grid-cols-2 h-full">
+                    {project.images.slice(0, 4).map((img) => (
+                      <div
+                        key={img.id}
+                        className="relative bg-cover bg-center"
+                        style={{
+                          backgroundImage: `url(${img.url})`,
+                          gridColumn: project.images.length === 1 ? 'span 2' : undefined,
+                          gridRow: project.images.length === 1 ? 'span 2' : undefined,
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-slate-300">
+                    <Images size={40} />
+                  </div>
+                )}
+                <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                  {project._count.images} image{project._count.images !== 1 ? 's' : ''}
+                </div>
+              </div>
+
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base line-clamp-1">{project.title}</CardTitle>
+                <CardDescription className="line-clamp-2">
+                  {project.description || 'No description'}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <p className="text-xs text-slate-400 mb-4">
+                  Updated {formatDate(project.updatedAt)}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => router.push(`/projects/${project.id}`)}
+                  >
+                    <FolderOpen size={14} className="mr-1.5" />
+                    Open
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={project._count.images === 0 || generatingId === project.id}
+                    onClick={() => handleGenerate(project.id, project.title)}
+                  >
+                    {generatingId === project.id ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Download size={14} />
+                    )}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                    disabled={deletingId === project.id}
+                    onClick={() => handleDelete(project.id)}
+                  >
+                    {deletingId === project.id ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={14} />
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+===== src/app/(dashboard)/projects/new/page.tsx =====
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { ArrowLeft, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useToast } from '@/components/ui/toast'
+
+export default function NewProjectPage() {
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+  const { toast } = useToast()
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!title.trim()) return
+
+    setLoading(true)
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: title.trim(), description: description.trim() || undefined }),
+      })
+      if (!res.ok) throw new Error()
+      const project = await res.json()
+      toast('Project created!')
+      router.push(`/projects/${project.id}`)
+    } catch {
+      toast('Failed to create project', 'error')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="max-w-xl mx-auto space-y-6">
+      <Link
+        href="/"
+        className="inline-flex items-center text-sm text-slate-500 hover:text-slate-900"
+      >
+        <ArrowLeft size={16} className="mr-1" />
+        Back to projects
+      </Link>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Create New Project</CardTitle>
+          <CardDescription>
+            Give your presentation a name. You can upload images on the next screen.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Title *</label>
+              <Input
+                placeholder="e.g. Product Launch Deck"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                autoFocus
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Description</label>
+              <Textarea
+                placeholder="Optional short description..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button type="submit" disabled={loading || !title.trim()}>
+                {loading && <Loader2 size={16} className="mr-2 animate-spin" />}
+                Create Project
+              </Button>
+              <Link href="/">
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </Link>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+===== src/app/(dashboard)/projects/[id]/page.tsx =====
+'use client'
+
+import { useEffect, useState, useCallback, useRef } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import {
+  ArrowLeft,
+  Upload,
+  Trash2,
+  Download,
+  Loader2,
+  ImageIcon,
+  Pencil,
+  Check,
+  X,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent } from '@/components/ui/card'
+import { useToast } from '@/components/ui/toast'
+
+interface ImageItem {
+  id: string
+  filename: string
+  url: string
+  order: number
+}
+
+interface Project {
+  id: string
+  title: string
+  description: string | null
+  images: ImageItem[]
+  _count: { images: number }
+}
+
+export default function ProjectDetailPage() {
+  const params = useParams()
+  const id = params.id as string
+  const router = useRouter()
+  const { toast } = useToast()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const [project, setProject] = useState<Project | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDesc, setEditDesc] = useState('')
+  const [dragOver, setDragOver] = useState(false)
+
+  const fetchProject = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/projects/${id}`)
+      if (!res.ok) {
+        if (res.status === 404) router.push('/')
+        return
+      }
+      const data = await res.json()
+      setProject(data)
+      setEditTitle(data.title)
+      setEditDesc(data.description || '')
+    } catch {
+      toast('Failed to load project', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }, [id, router, toast])
+
+  useEffect(() => {
+    fetchProject()
+  }, [fetchProject])
+
+  async function handleUpload(files: FileList | File[]) {
+    const list = Array.from(files).filter((f) => f.type.startsWith('image/'))
+    if (!list.length) {
+      toast('Please select image files', 'error')
+      return
+    }
+
+    setUploading(true)
+    const formData = new FormData()
+    list.forEach((f) => formData.append('files', f))
+
+    try {
+      const res = await fetch(`/api/projects/${id}/images`, {
+        method: 'POST',
+        body: formData,
+      })
+      if (!res.ok) throw new Error()
+      const newImages = await res.json()
+      setProject((prev) =>
+        prev
+          ? {
+              ...prev,
+              images: [...prev.images, ...newImages],
+              _count: { images: prev._count.images + newImages.length },
+            }
+          : prev
+      )
+      toast(`${newImages.length} image${newImages.length > 1 ? 's' : ''} uploaded`)
+    } catch {
+      toast('Upload failed', 'error')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleDeleteImage(imageId: string) {
+    if (!confirm('Remove this image?')) return
+    setProject((prev) =>
+      prev
+        ? {
+            ...prev,
+            images: prev.images.filter((i) => i.id !== imageId),
+            _count: { images: prev._count.images - 1 },
+          }
+        : prev
+    )
+    try {
+      const res = await fetch(`/api/images/${imageId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error()
+      toast('Image removed')
+    } catch {
+      toast('Failed to remove', 'error')
+      fetchProject()
+    }
+  }
+
+  async function handleSaveMeta() {
+    try {
+      const res = await fetch(`/api/projects/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: editTitle, description: editDesc || null }),
+      })
+      if (!res.ok) throw new Error()
+      const updated = await res.json()
+      setProject((prev) => (prev ? { ...prev, ...updated } : prev))
+      setEditing(false)
+      toast('Project updated')
+    } catch {
+      toast('Failed to update', 'error')
+    }
+  }
+
+  async function handleGenerate() {
+    if (!project || project.images.length === 0) return
+    setGenerating(true)
+    try {
+      const res = await fetch(`/api/projects/${id}/generate`, { method: 'POST' })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed')
+      }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${project.title.replace(/\s+/g, '-')}.pptx`
+      a.click()
+      URL.revokeObjectURL(url)
+      toast('Presentation downloaded!')
+    } catch (e: any) {
+      toast(e.message || 'Generation failed', 'error')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  function onDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOver(false)
+    if (e.dataTransfer.files.length) {
+      handleUpload(e.dataTransfer.files)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="h-8 w-48 bg-slate-200 rounded animate-pulse" />
+        <div className="h-64 bg-slate-100 rounded-xl animate-pulse" />
+      </div>
+    )
+  }
+
+  if (!project) return null
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <Link
+            href="/"
+            className="inline-flex items-center text-sm text-slate-500 hover:text-slate-900 mb-2"
+          >
+            <ArrowLeft size={16} className="mr-1" />
+            All projects
+          </Link>
+
+          {editing ? (
+            <div className="space-y-3 max-w-lg">
+              <Input
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="text-xl font-bold h-11"
+              />
+              <Textarea
+                value={editDesc}
+                onChange={(e) => setEditDesc(e.target.value)}
+                rows={2}
+                placeholder="Description..."
+              />
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleSaveMeta}>
+                  <Check size={14} className="mr-1" /> Save
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setEditing(false)}>
+                  <X size={14} className="mr-1" /> Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-slate-900">{project.title}</h1>
+                <button
+                  onClick={() => setEditing(true)}
+                  className="p-1.5 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+                >
+                  <Pencil size={16} />
+                </button>
+              </div>
+              {project.description && (
+                <p className="text-slate-500">{project.description}</p>
+              )}
+            </>
+          )}
+        </div>
+
+        <Button
+          onClick={handleGenerate}
+          disabled={project.images.length === 0 || generating}
+        >
+          {generating ? (
+            <Loader2 size={18} className="mr-2 animate-spin" />
+          ) : (
+            <Download size={18} className="mr-2" />
+          )}
+          Generate PPT
+        </Button>
+      </div>
+
+      <div
+        onDragOver={(e) => {
+          e.preventDefault()
+          setDragOver(true)
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={onDrop}
+        className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+          dragOver
+            ? 'border-indigo-500 bg-indigo-50'
+            : 'border-slate-200 bg-white hover:border-slate-300'
+        }`}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => e.target.files && handleUpload(e.target.files)}
+        />
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center">
+            {uploading ? (
+              <Loader2 className="text-indigo-500 animate-spin" size={22} />
+            ) : (
+              <Upload className="text-indigo-500" size={22} />
+            )}
+          </div>
+          <div>
+            <p className="font-medium text-slate-700">
+              {uploading ? 'Uploading...' : 'Drop images here or click to upload'}
+            </p>
+            <p className="text-sm text-slate-400 mt-0.5">PNG, JPG, WebP up to 10MB each</p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            Choose Files
+          </Button>
+        </div>
+      </div>
+
+      {project.images.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-14 text-center">
+            <ImageIcon className="text-slate-300 mb-3" size={40} />
+            <h3 className="font-semibold text-slate-700">No images yet</h3>
+            <p className="text-sm text-slate-500 mt-1">
+              Upload images above to start building your presentation
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {project.images
+            .sort((a, b) => a.order - b.order)
+            .map((img, idx) => (
+              <div
+                key={img.id}
+                className="group relative rounded-xl overflow-hidden border border-slate-200 bg-white shadow-sm"
+              >
+                <div className="aspect-video bg-slate-100 relative">
+                  <img
+                    src={img.url}
+                    alt={img.filename}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-2 left-2 bg-black/60 text-white text-xs font-medium w-6 h-6 rounded-full flex items-center justify-center">
+                    {idx + 1}
+                  </div>
+                </div>
+                <div className="p-3 flex items-center justify-between gap-2">
+                  <p className="text-sm text-slate-600 truncate flex-1">{img.filename}</p>
+                  <button
+                    onClick={() => handleDeleteImage(img.id)}
+                    className="p-1.5 rounded-md text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+===== src/app/login/page.tsx =====
+'use client'
+
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Presentation, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
+export default function LoginPage() {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+    })
+
+    if (res?.error) {
+      setError('Invalid email or password')
+      setLoading(false)
+    } else {
+      router.push('/')
+      router.refresh()
+    }
+  }
+
+  function fillDemo() {
+    setEmail('demo@example.com')
+    setPassword('demo1234')
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-3">
+          <div className="mx-auto w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center">
+            <Presentation className="text-white" size={24} />
+          </div>
+          <CardTitle className="text-2xl">Welcome back</CardTitle>
+          <CardDescription>Sign in to Image to PPT</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                {error}
+              </div>
+            )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Email</label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Password</label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 size={16} className="mr-2 animate-spin" />}
+              Sign in
+            </Button>
+          </form>
+
+          <div className="mt-4">
+            <Button type="button" variant="outline" className="w-full" onClick={fillDemo}>
+              Try demo account
+            </Button>
+            <p className="text-xs text-center text-slate-400 mt-2">
+              demo@example.com / demo1234
+            </p>
+          </div>
+
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="text-indigo-600 font-medium hover:underline">
+              Sign up
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+===== src/app/register/page.tsx =====
+'use client'
+
+import { useState } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Presentation, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+
+export default function RegisterPage() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || 'Registration failed')
+      }
+
+      const signInRes = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
+
+      if (signInRes?.error) {
+        router.push('/login')
+      } else {
+        router.push('/')
+        router.refresh()
+      }
+    } catch (e: any) {
+      setError(e.message || 'Something went wrong')
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-indigo-50 p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center space-y-3">
+          <div className="mx-auto w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center">
+            <Presentation className="text-white" size={24} />
+          </div>
+          <CardTitle className="text-2xl">Create account</CardTitle>
+          <CardDescription>Start converting images to PowerPoint</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                {error}
+              </div>
+            )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Name</label>
+              <Input
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Email</label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Password</label>
+              <Input
+                type="password"
+                placeholder="At least 6 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={6}
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading && <Loader2 size={16} className="mr-2 animate-spin" />}
+              Create account
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Already have an account?{' '}
+            <Link href="/login" className="text-indigo-600 font-medium hover:underline">
+              Sign in
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+===== README.md =====
+# Image to PPT
+
+Full-stack app that converts image collections into PowerPoint presentations.
+
+## Quick Start
+
+```bash
+npm install
+npx prisma db push
+npx prisma db seed
+npm run dev
+Demo: demo@example.com / demo1234
+
+
+
